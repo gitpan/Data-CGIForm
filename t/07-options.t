@@ -1,4 +1,4 @@
-# $Id: 07-options.t,v 1.1 2002/11/07 00:19:41 ctriv Exp $
+# $Id: 07-options.t,v 1.2 2002/12/08 07:42:26 ctriv Exp $
 
 
 use Test::More tests => 8;
@@ -56,7 +56,7 @@ ok($started->error,    'unstarted was not checked');
 ok(!$unstarted->error, 'unstarted was');
 
 is($unstarted->letter,  '', 'letter is an empty string');
-is($unstarted->started, '', 'started is an empty string');
+is($unstarted->number,  '', 'number is an empty string');
 
 #
 # Make sure that bails if the start_param isn't in the spec;

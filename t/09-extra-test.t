@@ -1,4 +1,4 @@
-# $Id: 09-extra-test.t,v 1.2 2002/11/12 11:54:25 ctriv Exp $
+# $Id: 09-extra-test.t,v 1.3 2003/01/27 20:28:47 ctriv Exp $
 
 
 use Test::More tests => 14;
@@ -69,7 +69,7 @@ is($fail,    1, 'fail ran');
 # Also make sure we can set the error message, as we advertise this.
 #
 my @args;
-my %data = (
+%data = (
 	foo  => 10,
 	bar  => 10,
 );	

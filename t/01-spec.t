@@ -1,7 +1,6 @@
-# $Id: 01-spec.t,v 1.8 2002/11/27 05:58:21 ctriv Exp $
+# $Id: 01-spec.t,v 1.10 2003/01/06 21:09:02 ctriv Exp $
 
-use Test::More tests => 35;
-
+use Test::More tests => 25;
 use strict;
 
 
@@ -59,8 +58,7 @@ ok($number,                              'number exists');
 is(ref $number, 'HASH',                  'and is hashref'); 
 ok($number->{'regexp'},                  'regexp for number exists');
 ok(!$number->{'filter'},                 'filter is empty');
-like($number->{'errors'}->{'empty'},     qr/\[% key %\]/, 'default errors exists'); 
-like($number->{'errors'}->{'invalid'},   qr/\[% key %\]/, 'default errors exists'); 
+ok(!$number->{'errors'},     			 'errors are empty');
 is($number->{'optional'},                0,               'optional set to 0');
 
 ###############################################################################
@@ -70,15 +68,14 @@ my $hex = $spec->{'hex'};
 ok($hex,                                'hex exists');
 is(ref $hex, 'HASH',                    'and is hashref');
 ok($hex->{'regexp'},                    'hex regexp exists');
-is(ref $hex->{'filter'}, 'ARRAY',       'filter is an array ref');
+#is(ref $hex->{'filter'}, 'ARRAY',       'filter is an array ref');
 
-my @pre = @{$hex->{'filter'}};
-is(scalar(@pre), 2,                     'filter contains two elements');
-is(ref @pre[0], 'CODE',                 'first element is a coderef');
-is(ref @pre[1], 'CODE',                 'second elements is a coderef');
+#my @pre = @{$hex->{'filter'}};
+#is(scalar(@pre), 2,                     'filter contains two elements');
+#is(ref @pre[0], 'CODE',                 'first element is a coderef');
+#is(ref @pre[1], 'CODE',                 'second elements is a coderef');
 
-like($number->{'errors'}->{'empty'},    qr/\[% key %\]/, 'default errors exists'); 
-like($number->{'errors'}->{'invalid'},  qr/\[% key %\]/, 'default errors exists'); 
+ok(!$hex->{'errors'},     			    'errors are empty');
 
 is($hex->{'optional'}, 0,               'optional set to 0');
 
@@ -90,14 +87,14 @@ my $letter = $spec->{'letter'};
 ok($letter,                             'letter exists');
 is(ref $letter, 'HASH',                 'and is hashref');
 ok($letter->{'regexp'},                 'letter regexp exists');
-is(ref $letter->{'filter'}, 'ARRAY',    'filter is an array ref');
+#is(ref $letter->{'filter'}, 'ARRAY',    'filter is an array ref');
 
-my @pre = @{$letter->{'filter'}};
-is(scalar(@pre), 1,                     'filter contains two elements');
-is(ref @pre[0], 'CODE',                 'first element is a coderef');
+#my @pre = @{$letter->{'filter'}};
+#is(scalar(@pre), 1,                     'filter contains two elements');
+#is(ref @pre[0], 'CODE',                 'first element is a coderef');
 
-like($letter->{'errors'}->{'empty'},    qr/\[% key %\]/, 'default errors exists'); 
-like($letter->{'errors'}->{'invalid'},  qr/\[% key %\]/, 'default errors exists'); 
+ok(!$letter->{'errors'},     			'errors are empty');
+
 
 is($letter->{'optional'}, 1,            'optional set to 1');
 

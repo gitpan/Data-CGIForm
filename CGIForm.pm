@@ -1,13 +1,13 @@
 package Data::CGIForm;
 #
-# $Id: CGIForm.pm,v 1.19 2002/12/03 04:59:06 ctriv Exp $
+# $Id: CGIForm.pm,v 1.29 2003/09/29 21:21:07 ctriv Exp $
 #
 use 5.006;
 use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = 0.2;
+our $VERSION = 0.3;
 
 =head1 NAME
 
@@ -18,6 +18,11 @@ Data::CGIForm - Form Data Interface.
 Data::CGIForm is yet another way to parse and handle CGI form data.
 The main motivation behind this module was a simple specification
 based validator that could handle multiple values.
+
+You probably don't want to use this module.  L<CGI::Validate|CGI::Validate>
+is a much more feature complete take on getting this sort of work done.
+You may then ask why this is on the CPAN, I ask that of myself from time to 
+time....
 
 =head1 SYNOPSIS
 
@@ -118,6 +123,18 @@ come looking for you if you do, and you taste good with ketchup.
 =item regexp
 
 The regular expression that the data must match.
+
+=item length
+
+The I<exact> length that the input must be.
+
+=item min_length
+
+The minimum length that the input may be.
+
+=item max_length
+
+The maximum length that the input may be.
 
 =item filter
 
@@ -286,7 +303,7 @@ want to do this yourself to keep with the built in behavior:
 
 =head2 Data::CGIForm->new()
 
-Creates the Data::CGIForm object.  As of this writing no options are supported.
+Creates the Data::CGIForm object.
 
 This should be called in the following matter:
 
@@ -337,7 +354,7 @@ sub new {
 	
 	if ($params{'start_param'}) {
 		unless ($params{'spec'}->{$params{'start_param'}}) {
-			Carp::croak(qq(${$class}->new(): 'start_param' ("$params{'start_param'}") not listed in the spec.));
+			Carp::croak(qq(${class}->new(): 'start_param' ("$params{'start_param'}") not listed in the spec.));
 		}
 		
 		$self->{'start_param'} = $params{'start_param'};
@@ -419,6 +436,10 @@ sub _insert_spec {
 	my $filter     = delete $s->{'filter'};
 	my $extra_test = delete $s->{'extra_test'};
 	
+	my $length     = delete $s->{'length'};
+	my $min_length = delete $s->{'min_length'};
+	my $max_length = delete $s->{'max_length'};
+	
 	if (%{$s}) {
 		Carp::croak("new(): spec error: invalid options for $key: @{[ keys %{$s} ]}");
 	}
@@ -427,6 +448,10 @@ sub _insert_spec {
 		optional     => $optional,
 		regexp       => $regexp,		
 	);
+	
+	$spec{'length'}     = $length     if $length;
+	$spec{'min_length'} = $min_length if $min_length;
+	$spec{'max_length'} = $max_length if $max_length;
 	
 	if ($filter) {
 		my @filters = (ref $filter and ref $filter eq 'ARRAY') ? @{$filter} : ($filter);
@@ -464,9 +489,7 @@ sub _insert_spec {
 			Carp::croak('new(): spec error: errors not a hashref');
 		}
 		
-		my %errors = (
-			%DefaultErrors
-		);
+		my %errors = ();
 			
 		foreach my $type (@ValidErrorFields) {
 			my $msg = delete $errors->{$type} || next;
@@ -478,10 +501,7 @@ sub _insert_spec {
 		}
 		
 		$spec{'errors'} = \%errors;
-	} else {
-		$spec{'errors'} = { %DefaultErrors };
-	}
-		
+	}	
 	
 	$self->{'spec'}->{$key} = \%spec;
 }
@@ -572,7 +592,7 @@ sub _validate_params {
 		DATA: foreach my $data (@{$self->{'data'}->{$key}}) {
 			
 			next DATA unless defined $data;
-			
+				
 			if ($spec->{'filter'}) {
 				$_->(\$data) for @{$spec->{'filter'}};
 			}  
@@ -580,8 +600,8 @@ sub _validate_params {
 			unless ($data =~ $spec->{'regexp'}) {
 				$self->errorf($key => 'invalid' =>  $data);
 			} else {
-				my $data = $1;
-				
+				$data = $1;
+								
 				if ($spec->{'extra_test'}) {
 					foreach my $t (@{$spec->{'extra_test'}}) {
 						unless ($t->(\$data, $self, $key)) {
@@ -594,6 +614,21 @@ sub _validate_params {
 					}
 				}
 				
+				if (exists $spec->{'length'}) {
+					$self->errorf($key => 'invalid', $data), next DATA 
+							unless length($data) == $spec->{'length'};	
+				}
+				
+				if (exists $spec->{'max_length'}) {
+					$self->errorf($key => 'invalid', $data), next DATA 
+						unless length($data) <= $spec->{'max_length'};
+				}
+				
+				if (exists $spec->{'min_length'}) {
+					$self->errorf($key => 'invalid', $data), next DATA 
+						unless length($data) >= $spec->{'min_length'};
+				}	
+				
 				push(@new_data, $data);
 			}		
 		}
@@ -603,6 +638,19 @@ sub _validate_params {
 		} else {
 			delete $self->{'data'}->{$key};
 		}
+		
+		
+		
+	}
+	
+	#
+	# clear out the spec of the cruft we don't need anymore...
+	#
+	# XXX -- this is temp to make things work with storable.
+	#
+	foreach my $param (keys %{$self->{'spec'}}) {
+		delete $self->{'spec'}->{$param}->{'extra_test'};
+		delete $self->{'spec'}->{$param}->{'filter'};
 	}
 }
 
@@ -684,6 +732,16 @@ sub error {
 	}
 }
 
+=head2 $form->errors
+
+Returns a hash of all the errors in C<param_name =E<gt> error_message> pairs.
+
+=cut
+
+sub errors { return %{$_[0]->{'errors'}}; }
+
+
+
 =head2 $form->errorf($key, $type, $data) 
 
 Sets the error for C<$key> to the format type C<$type>, using C<$data>
@@ -695,23 +753,53 @@ sub errorf {
 	my ($self, $key, $type, $data) = @_;
 		
 	my $format;
+
 	unless ($self->{'spec'}->{$key}) {
 		Carp::croak("errorf(): Invalid key: $key");
 	}
-	unless ($format = $self->{'spec'}->{$key}->{'errors'}->{$type}) {
-		Carp::croak("errorf(): Invalid error type: $type");
+
+	if ($self->{'spec'}->{$key}->{'errors'}) {
+		$format = $self->{'spec'}->{$key}->{'errors'}->{$type} || $DefaultErrors{$type};
+	} else {
+		$format = $DefaultErrors{$type};
 	}
+
+	Carp::croak("errorf(): Invalid error type: $type") unless $format;
 	
 	my %map = (
 		key   => $key,
 		value => $data,
 	);
 
-
 	$format =~ s{\[%\s*(\w+)\s*%\]}{ $map{$1} || '' }egs;
 	
 	return $self->error($key => $format);
 }
+
+=head2 $form->started
+
+Returns boolean based on if the start_param was set.  True if the form was started, 
+false otherwise.
+
+=cut
+
+sub started {
+	my ($self) = @_;
+	
+	return $self->{'in_unstarted_mode'} ? 0 : 1;
+}
+
+=head2 $form->ready
+
+Returns boolean; true if the form is started and there are no errors, false
+other wise.
+
+=cut
+
+sub ready {
+	return ($_[0]->started and not $_[0]->error);
+}
+
 
 =head1 AUTOLOAD
 

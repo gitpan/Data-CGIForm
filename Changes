@@ -1,4 +1,18 @@
-$Id: Changes,v 1.2 2002/12/03 04:51:15 ctriv Exp $
+$Id: Changes,v 1.5 2003/09/29 21:20:54 ctriv Exp $
+
+0.03  9/29/2003
+
+	With any luck, this will be the last release of Data::CGIForm.  It's main
+	reason for existance is going away soon.
+
+	Added length options.
+	
+	Added started() method, which return boolean based of is the start_param
+	has been seen.
+	
+	Various documentation fixes.
+	
+	Optimized the storage of the default error strings.
 
 0.02  12/2/2002
 
