@@ -1,0 +1,10 @@
+$Id: Changes,v 1.2 2002/12/03 04:51:15 ctriv Exp $
+
+0.02  12/2/2002
+
+	First public release.
+
+0.01  11/1/2002
+	
+	Original version; created by h2xs 1.21 with options -X -n Data::CGIForm
+
