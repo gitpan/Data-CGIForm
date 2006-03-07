@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL,v 1.4 2002/11/27 05:54:42 ctriv Exp $
+# $Id: Makefile.PL,v 1.5 2006/03/07 18:33:22 twilde Exp $
 #
 use ExtUtils::MakeMaker;
 
@@ -7,7 +7,7 @@ eval { require 5.006 };
 
 die <<AMEN if $@;
 
-Data::CGIForm requires 5.6.0.  5.6.1 is probably best.
+Data::CGIForm requires 5.6.0.  5.6.1 or higher is probably best.
 
 AMEN
 
@@ -18,5 +18,5 @@ WriteMakefile(
 		Test::More => 0,
 	},	
 	ABSTRACT_FROM => 'CGIForm.pm',
-	AUTHOR        => 'Chris Reinhardt <ctriv@dyndns.org>',
+	AUTHOR        => 'Tim Wilde <twilde@dyndns.com>',
 );

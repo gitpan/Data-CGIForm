@@ -1,13 +1,13 @@
 package Data::CGIForm;
 #
-# $Id: CGIForm.pm,v 1.29 2003/09/29 21:21:07 ctriv Exp $
+# $Id: CGIForm.pm,v 1.30 2006/03/07 18:33:22 twilde Exp $
 #
 use 5.006;
 use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = 0.3;
+our $VERSION = 0.4;
 
 =head1 NAME
 
@@ -128,6 +128,8 @@ The regular expression that the data must match.
 
 The I<exact> length that the input must be.
 
+B<Note:> Length is tested after filtering, but before any extra_test is run.
+
 =item min_length
 
 The minimum length that the input may be.
@@ -213,8 +215,8 @@ our %Filters = (
 
 =head2 Error Strings
 
-For each key in the spec, you can specify different error messagses
-for different situations.   For example
+For each key in the spec, you can specify different error messagses for
+different situations.  For example:
 
  %spec = (
      field => {
@@ -283,9 +285,9 @@ data being filtered.  For example:
      }
      return 1;
  }
- 
-Note that just setting the error string does not clear the parameter.  You may
-want to do this yourself to keep with the built in behavior:
+
+Note that just setting the error string does not clear the parameter.  You
+may want to do this yourself to keep with the built in behavior:
 
  sub check_email {
      my ($textref, $form, $key) = @_;
@@ -298,7 +300,7 @@ want to do this yourself to keep with the built in behavior:
      }
      return 1;
  }
- 
+
 =head1 METHODS
 
 =head2 Data::CGIForm->new()
@@ -308,7 +310,7 @@ Creates the Data::CGIForm object.
 This should be called in the following matter:
 
   Data::CGIForm->new(datasource => $r, spec => \%spec, %options)
-  
+
 C<datasource> should be something that has a C<param()> method, like a L<CGI>
 object, or a L<Apache::Request> object.  C<%spec> is explained in the specification
 docs above.
@@ -602,18 +604,6 @@ sub _validate_params {
 			} else {
 				$data = $1;
 								
-				if ($spec->{'extra_test'}) {
-					foreach my $t (@{$spec->{'extra_test'}}) {
-						unless ($t->(\$data, $self, $key)) {
-							# Don't overide any error message that the test 
-							# function set.
-							$self->errorf($key => 'invalid', $data) 
-								unless $self->{'errors'}->{$key};
-							next DATA;
-						}
-					}
-				}
-				
 				if (exists $spec->{'length'}) {
 					$self->errorf($key => 'invalid', $data), next DATA 
 							unless length($data) == $spec->{'length'};	
@@ -628,6 +618,18 @@ sub _validate_params {
 					$self->errorf($key => 'invalid', $data), next DATA 
 						unless length($data) >= $spec->{'min_length'};
 				}	
+				
+				if ($spec->{'extra_test'}) {
+					foreach my $t (@{$spec->{'extra_test'}}) {
+						unless ($t->(\$data, $self, $key)) {
+							# Don't overide any error message that the test 
+							# function set.
+							$self->errorf($key => 'invalid', $data) 
+								unless $self->{'errors'}->{$key};
+							next DATA;
+						}
+					}
+				}
 				
 				push(@new_data, $data);
 			}		
@@ -834,23 +836,25 @@ Make sure the user hasn't given dangerous equal_to pairs.
 
 =head1 AUTHOR
 
-Chris Reinhardt E<lt>ctriv@dyndns.orgE<gt>
+Maintained by: Tim Wilde E<lt>twilde@dyndns.comE<gt>
+
+Originally by: Chris Reinhardt E<lt>cpan@triv.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2002 Chris Reinhardt E<lt>ctriv@dyndns.orgE<gt>.  All rights 
-reserved.  This program is free software; you can redistribute it and/or 
-modify it under the same terms as Perl itself.
+Portions Copyright (c) 2006 Dynamic Network Services, Inc.  All rights
+reserved.
+
+Portions Copyright (c) 2002 Chris Reinhardt.  All rights reserved.  This
+program is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
 
 =head1 SEE ALSO
 
 L<perl(1)>, L<CGI(1)>.
 
 =cut
-	
-	
+
+
 1;
 __END__
-
-	
-	
