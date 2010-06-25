@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL,v 1.5 2006/03/07 18:33:22 twilde Exp $
+# $Id: Makefile.PL 2 2010-06-25 14:41:40Z twilde $
 #
 use ExtUtils::MakeMaker;
 
@@ -18,5 +18,5 @@ WriteMakefile(
 		Test::More => 0,
 	},	
 	ABSTRACT_FROM => 'CGIForm.pm',
-	AUTHOR        => 'Tim Wilde <twilde@dyndns.com>',
+	AUTHOR        => 'Tim Wilde <twilde@cymru.com>',
 );

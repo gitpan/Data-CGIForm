@@ -1,13 +1,13 @@
 package Data::CGIForm;
 #
-# $Id: CGIForm.pm,v 1.30 2006/03/07 18:33:22 twilde Exp $
+# $Id: CGIForm.pm 2 2010-06-25 14:41:40Z twilde $
 #
 use 5.006;
 use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = 0.4;
+our $VERSION = 0.5;
 
 =head1 NAME
 
@@ -228,10 +228,11 @@ different situations.  For example:
      },
  ); 
  
-Currently, there are three error types.  C<invalid> is used when
+Currently, there are four error types.  C<invalid> is used when
 the data does not match the validation specification, while
 C<empty> is used when no data was given and the field is not optional.
-C<unequal> is used when an equal_to pair does not match.
+C<unequal> is used when an equal_to pair does not match. C<length> is used
+when a length, min_length, or max_length parameter is violated.
 
 Two tags are filled in when the error messages are set:
 
@@ -252,9 +253,10 @@ our %DefaultErrors = (
 	invalid => 'The input for [% key %] ("[% value %]") is invalid.',
 	empty   => '"[% key %]" not given.',
 	unequal => 'The two fields must match.',
+	length  => 'The input for [% key %} ("[% value %]") does not meet length constraints.',
 );
 
-our @ValidErrorFields = qw(invalid empty unequal);
+our @ValidErrorFields = qw(invalid empty unequal length);
 
 =head2 Extra Test
 
@@ -605,17 +607,17 @@ sub _validate_params {
 				$data = $1;
 								
 				if (exists $spec->{'length'}) {
-					$self->errorf($key => 'invalid', $data), next DATA 
+					$self->errorf($key => 'length', $data), next DATA 
 							unless length($data) == $spec->{'length'};	
 				}
 				
 				if (exists $spec->{'max_length'}) {
-					$self->errorf($key => 'invalid', $data), next DATA 
+					$self->errorf($key => 'length', $data), next DATA 
 						unless length($data) <= $spec->{'max_length'};
 				}
 				
 				if (exists $spec->{'min_length'}) {
-					$self->errorf($key => 'invalid', $data), next DATA 
+					$self->errorf($key => 'length', $data), next DATA 
 						unless length($data) >= $spec->{'min_length'};
 				}	
 				
@@ -836,11 +838,13 @@ Make sure the user hasn't given dangerous equal_to pairs.
 
 =head1 AUTHOR
 
-Maintained by: Tim Wilde E<lt>twilde@dyndns.comE<gt>
+Maintained by: Tim Wilde E<lt>twilde@cymru.comE<gt>
 
 Originally by: Chris Reinhardt E<lt>cpan@triv.orgE<gt>
 
 =head1 COPYRIGHT
+
+Portions Copyright (c) 2007 Tim Wilde.  All rights reserved.
 
 Portions Copyright (c) 2006 Dynamic Network Services, Inc.  All rights
 reserved.

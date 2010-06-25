@@ -1,4 +1,4 @@
-# $Id: 02-methods.t,v 1.4 2002/11/12 12:27:19 ctriv Exp $
+# $Id: 02-methods.t 2 2010-06-25 14:41:40Z twilde $
 
 
 use Test::More tests => 8;

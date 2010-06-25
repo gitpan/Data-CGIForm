@@ -1,4 +1,4 @@
-# $Id: 06-filter.t,v 1.4 2002/11/25 07:06:21 ctriv Exp $
+# $Id: 06-filter.t 2 2010-06-25 14:41:40Z twilde $
 
 
 use Test::More tests => 13;

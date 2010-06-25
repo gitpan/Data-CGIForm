@@ -1,4 +1,4 @@
-# $Id: 05-multiple.t,v 1.1 2002/11/05 21:08:56 ctriv Exp $
+# $Id: 05-multiple.t 2 2010-06-25 14:41:40Z twilde $
 
 
 use Test::More tests => 12;

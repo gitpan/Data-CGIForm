@@ -1,4 +1,4 @@
-# $Id: 04-autoload.t,v 1.2 2002/11/12 07:02:33 ctriv Exp $
+# $Id: 04-autoload.t 2 2010-06-25 14:41:40Z twilde $
 
 
 use Test::More tests => 7;

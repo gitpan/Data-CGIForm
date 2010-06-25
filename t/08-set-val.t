@@ -1,4 +1,4 @@
-# $Id: 08-set-val.t,v 1.2 2002/11/12 10:33:09 ctriv Exp $
+# $Id: 08-set-val.t 2 2010-06-25 14:41:40Z twilde $
 
 
 use Test::More tests => 21;

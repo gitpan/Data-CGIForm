@@ -1,4 +1,4 @@
-# $Id: 03-errors.t,v 1.6 2002/11/19 14:59:15 ctriv Exp $
+# $Id: 03-errors.t 2 2010-06-25 14:41:40Z twilde $
 
 
 use Test::More tests => 35;

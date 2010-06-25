@@ -1,4 +1,4 @@
-# $Id: 10-equal-to.t,v 1.2 2002/11/13 04:43:19 ctriv Exp $
+# $Id: 10-equal-to.t 2 2010-06-25 14:41:40Z twilde $
 
 
 use Test::More tests => 13;

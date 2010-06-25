@@ -1,4 +1,4 @@
-# $Id: 01-spec.t,v 1.10 2003/01/06 21:09:02 ctriv Exp $
+# $Id: 01-spec.t 2 2010-06-25 14:41:40Z twilde $
 
 use Test::More tests => 25;
 use strict;

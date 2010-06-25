@@ -1,4 +1,4 @@
-# $Id: 07-options.t,v 1.2 2002/12/08 07:42:26 ctriv Exp $
+# $Id: 07-options.t 2 2010-06-25 14:41:40Z twilde $
 
 
 use Test::More tests => 8;
